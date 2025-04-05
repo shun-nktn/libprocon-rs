@@ -49,3 +49,9 @@ impl<const N: usize> std::ops::MulAssign for Mod<N> {
         *self = *self * rhs;
     }
 }
+
+impl<const N: usize> std::fmt::Display for Mod<N> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}
