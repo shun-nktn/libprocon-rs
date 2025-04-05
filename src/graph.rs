@@ -18,9 +18,11 @@ impl DirectedGraph {
         let mut result = Vec::new();
         let mut visited = vec![false; self.n];
         for start in postorder.into_iter().rev() {
-            let mut single_scc = Vec::new();
-            transposed.dfs(start, &mut visited, &mut single_scc);
-            result.push(single_scc);
+            if !visited[start] {
+                let mut single_scc = Vec::new();
+                transposed.dfs(start, &mut visited, &mut single_scc);
+                result.push(single_scc);
+            }
         }
         result
     }
@@ -29,7 +31,9 @@ impl DirectedGraph {
         let mut result = Vec::new();
         let mut visited = vec![false; self.n];
         for start in 0..self.n {
-            self.dfs(start, &mut visited, &mut result);
+            if !visited[start] {
+                self.dfs(start, &mut visited, &mut result);
+            }
         }
         result
     }

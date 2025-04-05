@@ -26,13 +26,11 @@ impl DisjointSet {
         let rootu = self.find(u);
         let rootv = self.find(v);
         if self.ranks[rootu] < self.ranks[rootv] {
-            self.parents[u] = Some(rootv);
+            self.parents[rootu] = Some(rootv);
             rootv
         } else {
-            if self.ranks[rootv] > self.ranks[rootu] {
-                self.parents[v] = Some(rootu);
-            } else if rootu != rootv {
-                self.parents[v] = Some(rootu);
+            self.parents[rootv] = Some(rootu);
+            if self.ranks[rootu] == self.ranks[rootv] {
                 self.ranks[rootu] += 1;
             }
             rootu
