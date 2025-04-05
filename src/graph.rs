@@ -1,6 +1,6 @@
 pub struct DirectedGraph {
-    n: usize,
-    adj: Vec<Vec<usize>>,
+    pub n: usize,
+    pub adj: Vec<Vec<usize>>,
 }
 
 impl DirectedGraph {
