@@ -1,3 +1,3 @@
-pub struct Residue {
-    value: usize,
+pub struct Residue<const N: usize> {
+    value: usize
 }
