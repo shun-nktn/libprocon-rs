@@ -8,6 +8,13 @@ pub trait SegmentTreeCompatible: Copy {
     fn compose_assign(&mut self, rhs: Self) { *self = self.compose(rhs) }
 }
 
+impl SegmentTreeCompatible for usize {
+    fn ident() -> Self { 0 }
+    fn combine(self, rhs: Self) -> Self { self.max(rhs) }
+    fn apply(self, rhs: Self) -> Self { self + rhs }
+    fn compose(self, rhs: Self) -> Self { self + rhs }
+}
+
 #[derive(Clone)]
 pub struct SegmentTree<T> where
     T: SegmentTreeCompatible {
@@ -117,16 +124,7 @@ impl TraversalState {
 
 #[cfg(test)]
 mod tests {
-    use super::{SegmentTreeCompatible, SegmentTree};
-
-    // Implement SegmentTreeCompatible for usize to support range addition and range maximum.
-    // The identity element is 0, combine returns the maximum, and both apply and compose do addition.
-    impl SegmentTreeCompatible for usize {
-        fn ident() -> Self { 0 }
-        fn combine(self, rhs: Self) -> Self { self.max(rhs) }
-        fn apply(self, rhs: Self) -> Self { self + rhs }
-        fn compose(self, rhs: Self) -> Self { self + rhs }
-    }
+    use super::SegmentTree;
 
     #[test]
     fn test_update_and_query_whole_range() {
