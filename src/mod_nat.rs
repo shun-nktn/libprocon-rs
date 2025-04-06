@@ -55,3 +55,85 @@ impl<const N: usize> std::fmt::Display for Mod<N> {
         write!(f, "{}", self.value)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new_modulation() {
+        let a: Mod<7> = Mod::new(10);
+        // 10 mod 7 = 3
+        assert_eq!(a.value, 3);
+    }
+
+    #[test]
+    fn test_add() {
+        let a: Mod<7> = Mod::new(3);
+        let b: Mod<7> = Mod::new(5);
+        let c = a + b;
+        // (3 + 5) mod 7 = 8 mod 7 = 1
+        assert_eq!(c.value, 1);
+    }
+
+    #[test]
+    fn test_add_assign() {
+        let mut a: Mod<7> = Mod::new(3);
+        let b: Mod<7> = Mod::new(5);
+        a += b;
+        // (3 + 5) mod 7 = 1
+        assert_eq!(a.value, 1);
+    }
+
+    #[test]
+    fn test_mul() {
+        let a: Mod<7> = Mod::new(3);
+        let b: Mod<7> = Mod::new(5);
+        let c = a * b;
+        // (3 * 5) mod 7 = 15 mod 7 = 1
+        assert_eq!(c.value, 1);
+    }
+
+    #[test]
+    fn test_mul_assign() {
+        let mut a: Mod<7> = Mod::new(3);
+        let b: Mod<7> = Mod::new(5);
+        a *= b;
+        // (3 * 5) mod 7 = 1
+        assert_eq!(a.value, 1);
+    }
+
+    #[test]
+    fn test_pow_zero_exponent() {
+        let a: Mod<7> = Mod::new(3);
+        let b = a.pow(0);
+        // any number^0 mod N should be 1
+        assert_eq!(b.value, 1);
+    }
+
+    #[test]
+    fn test_pow_small_exponent() {
+        let a: Mod<13> = Mod::new(2);
+        let b = a.pow(3);
+        // 2^3 = 8 mod 13 = 8
+        assert_eq!(b.value, 8);
+    }
+
+    #[test]
+    fn test_pow_large_exponent() {
+        let a: Mod<1_000_003> = Mod::new(7);
+        let b = a.pow(100);
+        // Calculate expected result by iterated multiplication
+        let mut expected = 1;
+        for _ in 0..100 {
+            expected = (expected * 7) % 1_000_003;
+        }
+        assert_eq!(b.value, expected);
+    }
+
+    #[test]
+    fn test_display() {
+        let a: Mod<7> = Mod::new(10); // 10 mod 7 = 3
+        assert_eq!(a.to_string(), "3");
+    }
+}
