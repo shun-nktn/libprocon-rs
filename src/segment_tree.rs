@@ -1,3 +1,11 @@
+trait SegmentTreeCompatible {
+    type E: Copy;
+    fn ident() -> Self::E;
+    fn combine(a: Self::E, b: Self::E) -> Self::E;
+    fn apply(a: Self::E, b: Self::E) -> Self::E;
+    fn compose(a: Self::E, b: Self::E) -> Self::E;
+}
+
 #[derive(Clone)]
 pub struct SegmentTree {
     size: usize,
