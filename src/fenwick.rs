@@ -1,8 +1,13 @@
 pub trait FenwickCompatible: Copy {
+    /// x + zero() == x
     fn zero() -> Self;
+    /// x + x.neg() == zero()
     fn neg(self) -> Self;
+    /// x.add(y) == y.add(x) && x.add(y).add(z) == x.add(y.add(z))
     fn add(self, rhs: Self) -> Self;
+    /// x.sub(y) == y.neg().add(x)
     fn sub(self, rhs: Self) -> Self;
+    /// x.scale(n) == (0..n).fold(zero(), |acc, _| acc.add(x))
     fn scale(self, n: usize) -> Self;
     fn add_assign(&mut self, rhs: Self) { *self = self.add(rhs) }
 }
