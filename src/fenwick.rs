@@ -4,6 +4,7 @@ pub trait FenwickCompatible: Copy {
     fn add(self, rhs: Self) -> Self;
     fn sub(self, rhs: Self) -> Self;
     fn scale(self, n: usize) -> Self;
+    fn add_assign(&mut self, rhs: Self) { *self = self.add(rhs) }
 }
 
 impl FenwickCompatible for isize {
@@ -39,13 +40,11 @@ impl<T> FenwickTree<T> where
 
     pub fn sum(&self, begin: usize, end: usize) -> T {
         if begin >= end { return T::zero(); }
-        match begin {
-            0 => self.sum_until(end),
-            _ => self.sum_until(end).sub(self.sum_until(begin)),
-        }
+        self.sum_until(end).sub(self.sum_until(begin))
     }
 
     fn sum_until(&self, end: usize) -> T {
+        if end == 0 { return T::zero(); }
         let sum = self.diffs.sum(end - 1);
         let offset = self.offsets.sum(end - 1);
         sum.scale(end).add(offset)
@@ -68,7 +67,7 @@ impl<T> PrimitiveFenwickTree<T> where
     fn add(&mut self, mut idx: usize, val: T) {
         idx += 1;
         while idx <= self.tree.len() {
-            self.tree[idx - 1] = T::add(self.tree[idx - 1], val);
+            self.tree[idx - 1].add_assign(val);
             idx += idx & idx.wrapping_neg();
         }
     }
@@ -77,7 +76,7 @@ impl<T> PrimitiveFenwickTree<T> where
         let mut result = T::zero();
         idx += 1;
         while idx > 0 {
-            result = T::add(result, self.tree[idx - 1]);
+            result.add_assign(self.tree[idx - 1]);
             idx -= idx & idx.wrapping_neg();
         }
         result
