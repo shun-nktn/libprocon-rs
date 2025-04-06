@@ -3,7 +3,6 @@ pub trait SegmentTreeCompatible: Copy {
     fn combine(self, rhs: Self) -> Self;
     fn apply(self, rhs: Self) -> Self;
     fn compose(self, rhs: Self) -> Self;
-    fn combine_assign(&mut self, rhs: Self) { *self = self.combine(rhs) }
     fn apply_assign(&mut self, rhs: Self) { *self = self.apply(rhs) }
     fn compose_assign(&mut self, rhs: Self) { *self = self.compose(rhs) }
 }
