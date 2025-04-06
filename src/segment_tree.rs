@@ -8,11 +8,30 @@ pub trait SegmentTreeCompatible: Copy {
     fn compose_assign(&mut self, rhs: Self) { *self = self.compose(rhs) }
 }
 
-impl SegmentTreeCompatible for usize {
-    fn ident() -> Self { 0 }
-    fn combine(self, rhs: Self) -> Self { self.max(rhs) }
-    fn apply(self, rhs: Self) -> Self { self + rhs }
-    fn compose(self, rhs: Self) -> Self { self + rhs }
+#[macro_export]
+macro_rules! impl_segment_tree_compatible {
+    (
+        $type:ty,
+        ident = $ident:expr,
+        combine = $combine:expr,
+        apply = $apply:expr,
+        compose = $compose:expr
+    ) => {
+        impl SegmentTreeCompatible for $type {
+            fn ident() -> Self {
+                $ident
+            }
+            fn combine(self, rhs: Self) -> Self {
+                $combine(self, rhs)
+            }
+            fn apply(self, rhs: Self) -> Self {
+                $apply(self, rhs)
+            }
+            fn compose(self, rhs: Self) -> Self {
+                $compose(self, rhs)
+            }
+        }
+    };
 }
 
 #[derive(Clone)]
@@ -124,7 +143,15 @@ impl TraversalState {
 
 #[cfg(test)]
 mod tests {
-    use super::SegmentTree;
+    use super::*;
+
+    impl_segment_tree_compatible!(
+        usize,
+        ident = 0,
+        combine = |l: usize, r: usize| l.max(r),
+        apply   = |l: usize, r: usize| l + r,
+        compose = |l: usize, r: usize| l + r
+    );
 
     #[test]
     fn test_update_and_query_whole_range() {
