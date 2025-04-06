@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub struct DisjointSet {
     parents: Vec<Option<usize>>,
     ranks: Vec<usize>,

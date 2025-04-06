@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub struct SegmentTree {
     size: usize,
     values: Vec<usize>, // 1-indexed

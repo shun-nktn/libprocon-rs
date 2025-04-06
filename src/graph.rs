@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub struct DirectedGraph {
     pub n: usize,
     pub adj: Vec<Vec<usize>>,

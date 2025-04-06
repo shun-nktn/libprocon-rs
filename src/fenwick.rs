@@ -9,6 +9,7 @@ pub trait FenwickCompatible {
     }
 }
 
+#[derive(Clone)]
 pub struct FenwickTree<T> where 
     T: FenwickCompatible {
     diff: PrimitiveFenwickTree<T>,
@@ -46,6 +47,7 @@ impl<T> FenwickTree<T> where
     }
 }
 
+#[derive(Clone)]
 struct PrimitiveFenwickTree<T> where 
     T: FenwickCompatible {
     tree: Vec<T::E>
