@@ -1,5 +1,3 @@
-use std::fmt::Debug;
-
 pub trait FenwickCompatible {
     type E: Copy;
     fn zero() -> Self::E;
@@ -87,7 +85,7 @@ impl<T> FenwickCompatible for Sum<T> where
     + std::ops::Add<Output = T>
     + std::ops::Sub<Output = T>
     + std::ops::Mul<Output = T>,
-    T::Error: Debug {
+    T::Error: std::fmt::Debug {
     type E = T;
     fn zero() -> Self::E { T::try_from(0).unwrap() }
     fn neg(a: Self::E) -> Self::E { - a }
