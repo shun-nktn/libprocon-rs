@@ -1,64 +1,70 @@
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Mod<const N: usize> {
-    pub value: usize
-}
+use cargo_snippet::snippet;
 
-impl<const N: usize> Mod<N> {
-    const _N_NOT_ZERO_OR_ONE: usize = 1 / ((N >= 2) as usize);
-
-    pub fn new(value: usize) -> Self {
-        Self { value: value % N }
+#[allow(dead_code)]
+#[snippet]
+mod mod_nat {
+    #[derive(Clone, Copy, PartialEq, Eq, Hash)]
+    pub struct Mod<const N: usize> {
+        pub value: usize
     }
 
-    pub fn pow(self, mut nth: usize) -> Self {
-        let mut result = Self::new(1);
-        let mut base = self;
-        while nth > 0 {
-            if nth % 2 == 1 {
-                result = result * base;
-            }
-            base = base * base;
-            nth /= 2;
+    impl<const N: usize> Mod<N> {
+        const _N_NOT_ZERO_OR_ONE: usize = 1 / ((N >= 2) as usize);
+
+        pub fn new(value: usize) -> Self {
+            Self { value: value % N }
         }
-        result
-    }
-}
 
-impl<const N: usize> std::ops::Add for Mod<N> {
-    type Output = Mod<N>;
-    fn add(self, rhs: Self) -> Self::Output {
-        Self::new(self.value + rhs.value)
+        pub fn pow(self, mut nth: usize) -> Self {
+            let mut result = Self::new(1);
+            let mut base = self;
+            while nth > 0 {
+                if nth % 2 == 1 {
+                    result = result * base;
+                }
+                base = base * base;
+                nth /= 2;
+            }
+            result
+        }
     }
-}
 
-impl<const N: usize> std::ops::AddAssign for Mod<N> {
-    fn add_assign(&mut self, rhs: Self) {
-        *self = *self + rhs;
+    impl<const N: usize> std::ops::Add for Mod<N> {
+        type Output = Mod<N>;
+        fn add(self, rhs: Self) -> Self::Output {
+            Self::new(self.value + rhs.value)
+        }
     }
-}
 
-impl<const N: usize> std::ops::Mul for Mod<N> {
-    type Output = Mod<N>;
-    fn mul(self, rhs: Self) -> Self::Output {
-        Self::new(self.value * rhs.value)
+    impl<const N: usize> std::ops::AddAssign for Mod<N> {
+        fn add_assign(&mut self, rhs: Self) {
+            *self = *self + rhs;
+        }
     }
-}
 
-impl<const N: usize> std::ops::MulAssign for Mod<N> {
-    fn mul_assign(&mut self, rhs: Self) {
-        *self = *self * rhs;
+    impl<const N: usize> std::ops::Mul for Mod<N> {
+        type Output = Mod<N>;
+        fn mul(self, rhs: Self) -> Self::Output {
+            Self::new(self.value * rhs.value)
+        }
     }
-}
 
-impl<const N: usize> std::fmt::Display for Mod<N> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.value)
+    impl<const N: usize> std::ops::MulAssign for Mod<N> {
+        fn mul_assign(&mut self, rhs: Self) {
+            *self = *self * rhs;
+        }
+    }
+
+    impl<const N: usize> std::fmt::Display for Mod<N> {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            write!(f, "{}", self.value)
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::mod_nat::*;
 
     #[test]
     fn test_new_modulation() {

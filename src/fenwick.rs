@@ -1,96 +1,102 @@
-pub trait FenwickCompatible: Copy {
-    /// x + zero() == x
-    fn zero() -> Self;
-    /// x + x.neg() == zero()
-    fn neg(self) -> Self;
-    /// x.add(y) == y.add(x) && x.add(y).add(z) == x.add(y.add(z))
-    fn add(self, rhs: Self) -> Self;
-    /// x.sub(y) == y.neg().add(x)
-    fn sub(self, rhs: Self) -> Self;
-    /// x.scale(n) == (0..n).fold(zero(), |acc, _| acc.add(x))
-    fn scale(self, n: usize) -> Self;
-    fn add_assign(&mut self, rhs: Self) { *self = self.add(rhs) }
-}
+use cargo_snippet::snippet;
 
-impl FenwickCompatible for isize {
-    fn zero() -> Self { 0 }
-    fn neg(self) -> Self { -self }
-    fn add(self, rhs: Self) -> Self { self + rhs }
-    fn sub(self, rhs: Self) -> Self { self - rhs }
-    fn scale(self, n: usize) -> Self { self * (n as isize) }
-}
-
-#[derive(Clone)]
-pub struct FenwickTree<T> where 
-    T: FenwickCompatible {
-    diffs: PrimitiveFenwickTree<T>,
-    offsets: PrimitiveFenwickTree<T>,
-}
-
-impl<T> FenwickTree<T> where 
-    T: FenwickCompatible {
-    pub fn new(size: usize) -> Self {
-        let diffs = PrimitiveFenwickTree::new(size);
-        let offsets = PrimitiveFenwickTree::new(size);
-        Self { diffs, offsets }
+#[allow(dead_code)]
+#[snippet]
+mod fenwick {
+    pub trait FenwickCompatible: Copy {
+        /// x + zero() == x
+        fn zero() -> Self;
+        /// x + x.neg() == zero()
+        fn neg(self) -> Self;
+        /// x.add(y) == y.add(x) && x.add(y).add(z) == x.add(y.add(z))
+        fn add(self, rhs: Self) -> Self;
+        /// x.sub(y) == y.neg().add(x)
+        fn sub(self, rhs: Self) -> Self;
+        /// x.scale(n) == (0..n).fold(zero(), |acc, _| acc.add(x))
+        fn scale(self, n: usize) -> Self;
+        fn add_assign(&mut self, rhs: Self) { *self = self.add(rhs) }
     }
 
-    pub fn add(&mut self, begin: usize, end: usize, val: T) {
-        if begin >= end { return; }
-        self.diffs.add(begin, val);
-        self.diffs.add(end, val.neg());
-        self.offsets.add(begin, val.scale(begin).neg());
-        self.offsets.add(end, val.scale(end));
+    impl FenwickCompatible for isize {
+        fn zero() -> Self { 0 }
+        fn neg(self) -> Self { -self }
+        fn add(self, rhs: Self) -> Self { self + rhs }
+        fn sub(self, rhs: Self) -> Self { self - rhs }
+        fn scale(self, n: usize) -> Self { self * (n as isize) }
     }
 
-    pub fn sum(&self, begin: usize, end: usize) -> T {
-        if begin >= end { return T::zero(); }
-        self.sum_until(end).sub(self.sum_until(begin))
+    #[derive(Clone)]
+    pub struct FenwickTree<T> where 
+        T: FenwickCompatible {
+        diffs: PrimitiveFenwickTree<T>,
+        offsets: PrimitiveFenwickTree<T>,
     }
 
-    fn sum_until(&self, end: usize) -> T {
-        if end == 0 { return T::zero(); }
-        let sum = self.diffs.sum(end - 1);
-        let offset = self.offsets.sum(end - 1);
-        sum.scale(end).add(offset)
-    }
-}
+    impl<T> FenwickTree<T> where 
+        T: FenwickCompatible {
+        pub fn new(size: usize) -> Self {
+            let diffs = PrimitiveFenwickTree::new(size);
+            let offsets = PrimitiveFenwickTree::new(size);
+            Self { diffs, offsets }
+        }
 
-#[derive(Clone)]
-struct PrimitiveFenwickTree<T> where 
-    T: FenwickCompatible {
-    tree: Vec<T>
-}
+        pub fn add(&mut self, begin: usize, end: usize, val: T) {
+            if begin >= end { return; }
+            self.diffs.add(begin, val);
+            self.diffs.add(end, val.neg());
+            self.offsets.add(begin, val.scale(begin).neg());
+            self.offsets.add(end, val.scale(end));
+        }
 
-impl<T> PrimitiveFenwickTree<T> where 
-    T: FenwickCompatible {
-    fn new(size: usize) -> Self {
-        let tree = vec![T::zero(); size];
-        Self { tree }
-    }
+        pub fn sum(&self, begin: usize, end: usize) -> T {
+            if begin >= end { return T::zero(); }
+            self.sum_until(end).sub(self.sum_until(begin))
+        }
 
-    fn add(&mut self, mut idx: usize, val: T) {
-        idx += 1;
-        while idx <= self.tree.len() {
-            self.tree[idx - 1].add_assign(val);
-            idx += idx & idx.wrapping_neg();
+        fn sum_until(&self, end: usize) -> T {
+            if end == 0 { return T::zero(); }
+            let sum = self.diffs.sum(end - 1);
+            let offset = self.offsets.sum(end - 1);
+            sum.scale(end).add(offset)
         }
     }
 
-    fn sum(&self, mut idx: usize) -> T {
-        let mut result = T::zero();
-        idx += 1;
-        while idx > 0 {
-            result.add_assign(self.tree[idx - 1]);
-            idx -= idx & idx.wrapping_neg();
+    #[derive(Clone)]
+    struct PrimitiveFenwickTree<T> where 
+        T: FenwickCompatible {
+        tree: Vec<T>
+    }
+
+    impl<T> PrimitiveFenwickTree<T> where 
+        T: FenwickCompatible {
+        fn new(size: usize) -> Self {
+            let tree = vec![T::zero(); size];
+            Self { tree }
         }
-        result
+
+        fn add(&mut self, mut idx: usize, val: T) {
+            idx += 1;
+            while idx <= self.tree.len() {
+                self.tree[idx - 1].add_assign(val);
+                idx += idx & idx.wrapping_neg();
+            }
+        }
+
+        fn sum(&self, mut idx: usize) -> T {
+            let mut result = T::zero();
+            idx += 1;
+            while idx > 0 {
+                result.add_assign(self.tree[idx - 1]);
+                idx -= idx & idx.wrapping_neg();
+            }
+            result
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::fenwick::*;
 
     #[test]
     fn test_empty() {
