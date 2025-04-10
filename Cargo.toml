@@ -9,3 +9,4 @@ path = "src/lib.rs"
 crate-type = ["lib"]
 
 [dependencies]
+cargo-snippet = "0.6.5"
